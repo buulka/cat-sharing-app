@@ -20,11 +20,13 @@ export class CatsService {
 
   async create(
     name: string,
+    color: string,
+    breed: string,
     age: number,
     price: number,
     isVacant: boolean,
   ): Promise<void> {
-    const cat = new Cat(name, age, price, isVacant);
+    const cat = new Cat(name, color, breed, age, price, isVacant);
     await this.catsRepository.save(cat);
   }
 }

@@ -22,6 +22,8 @@ export class CatsController {
     @Body()
     body: {
       name: string;
+      color: string;
+      breed: string;
       age: number;
       price: number;
       isVacant: boolean;
@@ -29,6 +31,8 @@ export class CatsController {
   ) {
     return this.catsService.create(
       body.name,
+      body.color,
+      body.breed,
       body.age,
       body.price,
       body.isVacant,
