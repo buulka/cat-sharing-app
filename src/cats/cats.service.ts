@@ -1,8 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cat } from './cat.entity';
-import { Connection, Repository } from 'typeorm';
-
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CatsService {
@@ -48,12 +47,11 @@ export class CatsService {
 
     const metaData = {
       'Content-Type': 'image/jpg',
-
     };
 
     minioClient.fPutObject(
       'cats',
-      'pic1',
+      'pic1.jpg',
       file,
       metaData,
 
@@ -66,4 +64,3 @@ export class CatsService {
     );
   }
 }
-
