@@ -10,12 +10,20 @@ export class CatsService {
     private catsRepository: Repository<Cat>,
   ) {}
 
-  getAll(): Promise<Cat[]> {
-    return this.catsRepository.find();
+  async getAll(): Promise<Cat[]> {
+    return await this.catsRepository.find();
   }
 
-  getById(id: string): Promise<Cat> {
-    return this.catsRepository.findOne(id);
+  async getById(id: string): Promise<Cat> {
+    return await this.catsRepository.findOne(id);
+  }
+
+  async makeStatusFalse(id: string): Promise<void> {
+    await this.catsRepository.update(id, { isVacant: false });
+  }
+
+  async makeStatusTrue(id: string): Promise<void> {
+    await this.catsRepository.update(id, { isVacant: true });
   }
 
   async create(
@@ -42,25 +50,13 @@ export class CatsService {
       useSSL: false,
     });
 
-    const file =
-      'C:/Users/Ekaterina Ivanova/cat-sharing-app/src/cats/files/pic1.jpg';
+    const fileName = ''; // custom field, fileName - cat's id + extension
+    const filePath = '' + fileName; // custom field
 
     const metaData = {
       'Content-Type': 'image/jpg',
     };
 
-    minioClient.fPutObject(
-      'cats',
-      'pic1.jpg',
-      file,
-      metaData,
-
-      function (err, etag) {
-        if (err) {
-          return console.log(err);
-        }
-        console.log('Success', etag);
-      },
-    );
+    minioClient.fPutObject('cats', 'pic1.jpg', filePath, metaData);
   }
 }

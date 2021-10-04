@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Put } from '@nestjs/common';
 import { CatsService } from './cats.service';
 
 @Controller('cats')
@@ -37,6 +37,16 @@ export class CatsController {
     );
   }
 
+  @Put('/vacant/:id')
+  makeStatusTrue(@Param('id') id: string) {
+    this.catsService.makeStatusTrue(id);
+  }
+
+  @Put('/reserved/:id')
+  makeStatusFalse(@Param('id') id: string) {
+    this.catsService.makeStatusFalse(id);
+  }
+
   @Post('/postphoto')
   postphoto() {
     return this.catsService.addPhoto();
@@ -44,10 +54,5 @@ export class CatsController {
   // @Delete(':id')
   // remove(@Param('id') id: string) {
   //   return 'Remove ' + id;
-  // }
-
-  // @Put(':id')
-  // update(@Body() updateCatDto: UpdateCatDto, @Param('id') id: string) {
-  //   return 'Update ' + id;
   // }
 }
