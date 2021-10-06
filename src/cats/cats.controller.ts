@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Param, Body, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { CatsService } from './cats.service';
 
 @Controller('cats')
@@ -15,7 +23,22 @@ export class CatsController {
     return this.catsService.getById(id);
   }
 
-  @Post()
+  @Put('/vacant/:id')
+  makeStatusTrue(@Param('id') id: string) {
+    this.catsService.makeStatusTrue(id);
+  }
+
+  @Put('/reserved/:id')
+  makeStatusFalse(@Param('id') id: string) {
+    this.catsService.makeStatusFalse(id);
+  }
+
+  @Delete('/delete/:id')
+  deleteItem(@Param('id') id: string) {
+    this.catsService.deleteCatItem(id);
+  }
+
+  @Post('/create')
   create(
     @Body()
     body: {
@@ -37,22 +60,13 @@ export class CatsController {
     );
   }
 
-  @Put('/vacant/:id')
-  makeStatusTrue(@Param('id') id: string) {
-    this.catsService.makeStatusTrue(id);
-  }
-
-  @Put('/reserved/:id')
-  makeStatusFalse(@Param('id') id: string) {
-    this.catsService.makeStatusFalse(id);
-  }
-
   @Post('/postphoto')
   postphoto() {
     return this.catsService.addPhoto();
   }
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return 'Remove ' + id;
-  // }
+
+  @Get('/photolink/:id')
+  getCatsPhotoLink(@Param('id') id: string) {
+    return this.catsService.getCatsPhotoLink(id);
+  }
 }
