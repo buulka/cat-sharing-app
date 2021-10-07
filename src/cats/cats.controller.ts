@@ -13,32 +13,32 @@ import { CatsService } from './cats.service';
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
-  @Get()
+  @Get('/all')
   getAll() {
     return this.catsService.getAll();
   }
 
-  @Get(':id')
+  @Get('/reserved')
+  getReservedCats() {
+    return this.catsService.getReserved();
+  }
+
+  @Get('/vacant')
+  getVacantCats() {
+    return this.catsService.getVacant();
+  }
+
+  @Get('/:id')
   getById(@Param('id') id: string) {
     return this.catsService.getById(id);
   }
 
-  @Put('/vacant/:id')
-  makeStatusTrue(@Param('id') id: string) {
-    this.catsService.makeStatusTrue(id);
+  @Get('/photolink/:id')
+  getCatsPhotoLink(@Param('id') id: string) {
+    return this.catsService.getCatsPhotoLink(id);
   }
 
-  @Put('/reserved/:id')
-  makeStatusFalse(@Param('id') id: string) {
-    this.catsService.makeStatusFalse(id);
-  }
-
-  @Delete('/delete/:id')
-  deleteItem(@Param('id') id: string) {
-    this.catsService.deleteCatItem(id);
-  }
-
-  @Post('/create')
+  @Post('admin/create')
   create(
     @Body()
     body: {
@@ -60,13 +60,23 @@ export class CatsController {
     );
   }
 
-  @Post('/postphoto')
+  @Post('admin/postphoto')
   postphoto() {
     return this.catsService.addPhoto();
   }
 
-  @Get('/photolink/:id')
-  getCatsPhotoLink(@Param('id') id: string) {
-    return this.catsService.getCatsPhotoLink(id);
+  @Put('admin/vacant/:id')
+  makeStatusTrue(@Param('id') id: string) {
+    this.catsService.makeStatusTrue(id);
+  }
+
+  @Put('admin/reserved/:id')
+  makeStatusFalse(@Param('id') id: string) {
+    this.catsService.makeStatusFalse(id);
+  }
+
+  @Delete('admin/delete/:id')
+  deleteItem(@Param('id') id: string) {
+    this.catsService.deleteCatItem(id);
   }
 }

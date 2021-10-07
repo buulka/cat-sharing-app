@@ -31,6 +31,14 @@ export class CatsService {
     return await this.catsRepository.findOne(id);
   }
 
+  async getReserved(): Promise<Cat[]> {
+    return await this.catsRepository.find({ isVacant: false });
+  }
+
+  async getVacant(): Promise<Cat[]> {
+    return await this.catsRepository.find({ isVacant: true });
+  }
+
   async makeStatusFalse(id: string): Promise<void> {
     await this.catsRepository.update(id, { isVacant: false });
   }
