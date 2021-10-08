@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 5923014kate
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: always
+
+  minio:
+    container_name: minio
+    image: minio/minio
+    command: 'server /data --console-address ":9001"'
+    environment:
+      MINIO_USER: kate
+      MINIO_PASSWORD: 5923014kate
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    restart: always
+
+  cat-sharing-app:
+    build:
+      context: .
+    container_name: cat-sharing-app
+    environment:
+      MINIO_HOST: 'minio'
+      DB_HOST: 'postgres'
+    ports:
+      - '3000:3000'
+    restart: always
+
+volumes:
+  minio-data:
+  pg-data:

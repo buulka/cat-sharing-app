@@ -8,7 +8,8 @@ function connectMinio() {
   const Minio = require('minio');
 
   return new Minio.Client({
-    endPoint: '127.0.0.1',
+    endPoint:
+      process.env.MINIO_HOST == null ? '127.0.0.1' : process.env.MINIO_HOST,
     port: 9000,
     accessKey: 'kate',
     secretKey: '5923014kate',
