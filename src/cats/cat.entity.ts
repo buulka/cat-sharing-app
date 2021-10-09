@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'cat' })
+@Entity({ name: 'cats' })
 export class Cat {
   @PrimaryGeneratedColumn()
   id: string;
@@ -23,6 +23,9 @@ export class Cat {
   @Column({ default: true })
   isVacant: boolean;
 
+  @Column({ default: null })
+  imgName: string;
+
   constructor(
     name: string,
     color: string,
@@ -30,6 +33,7 @@ export class Cat {
     age: number,
     price: number,
     isVacant: boolean,
+    imgName: string,
     id?: string,
   ) {
     this.id = id;
@@ -38,6 +42,7 @@ export class Cat {
     this.breed = breed;
     this.age = age;
     this.price = price;
+    this.imgName = imgName;
     this.isVacant = isVacant;
   }
 }

@@ -1,28 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { Response } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cat } from './cat.entity';
 import { Repository } from 'typeorm';
-
-function connectMinio() {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const Minio = require('minio');
-
-  return new Minio.Client({
-    endPoint:
-      process.env.MINIO_HOST == null ? '127.0.0.1' : process.env.MINIO_HOST,
-    port: 9000,
-    accessKey: 'kate',
-    secretKey: '5923014kate',
-    useSSL: false,
-  });
-}
+import Minio from 'minio';
 
 @Injectable()
 export class CatsService {
+  private readonly minioClient: Minio.Client;
+
   constructor(
     @InjectRepository(Cat)
-    private catsRepository: Repository<Cat>,
-  ) {}
+    private readonly catsRepository: Repository<Cat>,
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const Minio = require('minio');
+    this.minioClient = new Minio.Client({
+      endPoint:
+        process.env.MINIO_HOST == null ? '127.0.0.1' : process.env.MINIO_HOST,
+      port: 9000,
+      accessKey: 'minioadmin',
+      secretKey: 'minioadmin',
+      useSSL: false,
+    });
+    this.minioClient.bucketExists('cats').then((exists) => {
+      if (!exists) this.minioClient.makeBucket('cats', 'us-east-1');
+    });
+  }
 
   async getAll(): Promise<Cat[]> {
     return await this.catsRepository.find();
@@ -40,11 +44,11 @@ export class CatsService {
     return await this.catsRepository.find({ isVacant: true });
   }
 
-  async makeStatusFalse(id: string): Promise<void> {
+  async makeReserved(id: string): Promise<void> {
     await this.catsRepository.update(id, { isVacant: false });
   }
 
-  async makeStatusTrue(id: string): Promise<void> {
+  async makeVacant(id: string): Promise<void> {
     await this.catsRepository.update(id, { isVacant: true });
   }
 
@@ -59,33 +63,27 @@ export class CatsService {
     age: number,
     price: number,
     isVacant: boolean,
+    imgName: string,
   ): Promise<void> {
-    const cat = new Cat(name, color, breed, age, price, isVacant);
+    const cat = new Cat(name, color, breed, age, price, isVacant, imgName);
     await this.catsRepository.save(cat);
   }
 
-  async addPhoto(): Promise<void> {
-    const minioClient = connectMinio();
-
-    const fileName = ''; // custom field, fileName - cat's id + extension
-    const filePath = '' + fileName; // custom field
-    const objectName = ''; // custom field cat's id in db + .jpg
+  async addPhoto(id: string, buffer: Buffer): Promise<void> {
     const metaData = {
       'Content-Type': 'image/jpg',
     };
 
-    await minioClient.fPutObject('cats', objectName, filePath, metaData);
+    const imgName = id + '.jpg';
+
+    await this.minioClient.putObject('cats', imgName, buffer, metaData);
+    console.log('Image added');
+    await this.catsRepository.update(id, { imgName: imgName });
   }
 
-  async getCatsPhotoLink(id): Promise<any> {
-    const minioClient = connectMinio();
-
-    const a = await minioClient.presignedGetObject(
-      'cats',
-      'pic' + id + '.jpg',
-      24 * 60 * 60,
+  async getPhotoById(id: string, res: Response) {
+    this.minioClient.getObject('cats', id + '.jpg', (error, result) =>
+      result.pipe(res),
     );
-
-    return { url: a };
   }
 }
