@@ -1,73 +1,85 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# Тестовое задание для компании RobotBull
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Ожидаемый результат  
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+REST API для сервиса шеринга котиков
 
-## Description
+## Реализация  
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Серверная часть написана на Typescript с использованием фреймворка Nest.js. 
 
-## Installation
+Данные о котиках хранятся в базе данных PostgreSQL, работа с бд осуществляется с использованием TypeOrm.
 
-```bash
-$ npm install
+Фотографии котиков хранятся в Minio.  
+
+#### Сущности 
+
+Главной сущностью является котик:
+
+* `id` - id котика (string)
+* `name`- имя котика 
+* `color` - окрас котика
+* `breed` - порода котика
+* `age` - возраст котика
+* `price` - стоимость аренды котика
+* `isVacant` - состояние брони котика, по умолчанию true
+* `imgName` - название фотографии котика, хранящейся в Minio,по умолчанию null 
+
+
+#### API Endpoints
+
+* GET `/cats` - возвращает всех котиков в формате json
+    ```json
+  [
+    {
+        "id": 16,
+        "name": "Bob",
+        "color": "red",
+        "breed": "breed1",
+        "age": 16,
+        "price": 10.0,
+        "imgName": "16.jpg",
+        "isVacant": true
+    },
+    {
+        "id": 17,
+        "name": "Tom",
+        "color": "white",
+        "breed": "breed2",
+        "age": 8,
+        "price": 200.0,
+        "imgName": null,
+        "isVacant": false
+    }
+  ]
+  ```
+    * `/cats/:id` - возвращает информацию о котике с заданным id
+    * `/cats/vacant` - возвращает только свободных котиков
+    * `/cats/reserved` - возвращает только забронированных котиков
+    * `/cats/:id/photo` - возвращает фотографию котика с заданным id
+
+
+* POST `/cats` - принимает котика в формате json и добавляет в базу данных 
+```json
+{
+    "name": "Bob",
+    "age": 16,
+    "color": "red", 
+    "breed": "breed1",
+    "price": 10.0
+}
 ```
 
-## Running the app
 
-```bash
-# development
-$ npm run start
+* POST `/cats/:id/photo` - принимает изображение формата JPEG / JPG в multipart файле с именем 'file', сохраняет изображение в хранилище Minio с именем в формате '{id котика}.jpg' 
+ и записывает в поле `imgName` имя изображения в хранилище у котика с заданным id   
+* PUT `/cats/:id/vacant` - записывает в поле `isVacant` true у котика с заданным id, т.е котик становится доступным к бронированию
+* PUT `/cats/:id/reserved` - записывает в поле `isVacant` false у котика с заданным id, т.е котик бронируется
+* DELETE `/cats/:id` - удаляется из базы данных котик с заданным id
 
-# watch mode
-$ npm run start:dev
 
-# production mode
-$ npm run start:prod
+## Запуск приложения 
+Запуск всего проекта осуществляется  командой
+```shell
+docker-compose up -d
 ```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
