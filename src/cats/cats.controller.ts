@@ -36,14 +36,14 @@ export class CatsController {
   }
 
   @Get('/:id')
-  async getById(@Param('id') id: string, @Res() res: Response) {
+  async getById(@Param('id') id: number, @Res() res: Response) {
     const cat = await this.catsService.getById(id);
     if (cat == null) res.status(HttpStatus.NOT_FOUND).send('Я твой база шатал');
     else res.status(HttpStatus.OK).json(cat).send();
   }
 
   @Get('/:id/photo')
-  getPhotoById(@Param('id') id: string, @Res() res: Response) {
+  getPhotoById(@Param('id') id: number, @Res() res: Response) {
     return this.catsService.getPhotoById(id, res);
   }
 
@@ -73,22 +73,22 @@ export class CatsController {
 
   @Post('/:id/photo')
   @UseInterceptors(FileInterceptor('file'))
-  addPhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  addPhoto(@Param('id') id: number, @UploadedFile() file: Express.Multer.File) {
     this.catsService.addPhoto(id, file.buffer);
   }
 
   @Put('/:id/vacant')
-  makeVacant(@Param('id') id: string) {
+  makeVacant(@Param('id') id: number) {
     this.catsService.makeVacant(id);
   }
 
   @Put('/:id/reserved')
-  makeReserved(@Param('id') id: string) {
+  makeReserved(@Param('id') id: number) {
     this.catsService.makeReserved(id);
   }
 
   @Delete('/:id')
-  deleteItem(@Param('id') id: string) {
+  deleteItem(@Param('id') id: number) {
     this.catsService.deleteCatItem(id);
   }
 }

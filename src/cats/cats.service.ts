@@ -32,7 +32,7 @@ export class CatsService {
     return await this.catsRepository.find();
   }
 
-  async getById(id: string): Promise<Cat> {
+  async getById(id: number): Promise<Cat> {
     return await this.catsRepository.findOne(id);
   }
 
@@ -44,15 +44,15 @@ export class CatsService {
     return await this.catsRepository.find({ isVacant: true });
   }
 
-  async makeReserved(id: string): Promise<void> {
+  async makeReserved(id: number): Promise<void> {
     await this.catsRepository.update(id, { isVacant: false });
   }
 
-  async makeVacant(id: string): Promise<void> {
+  async makeVacant(id: number): Promise<void> {
     await this.catsRepository.update(id, { isVacant: true });
   }
 
-  async deleteCatItem(id: string): Promise<void> {
+  async deleteCatItem(id: number): Promise<void> {
     await this.catsRepository.delete(id);
   }
 
@@ -69,7 +69,7 @@ export class CatsService {
     await this.catsRepository.save(cat);
   }
 
-  async addPhoto(id: string, buffer: Buffer): Promise<void> {
+  async addPhoto(id: number, buffer: Buffer): Promise<void> {
     const metaData = {
       'Content-Type': 'image/jpg',
     };
@@ -81,7 +81,7 @@ export class CatsService {
     await this.catsRepository.update(id, { imgName: imgName });
   }
 
-  async getPhotoById(id: string, res: Response) {
+  async getPhotoById(id: number, res: Response) {
     this.minioClient.getObject('cats', id + '.jpg', (error, result) =>
       result.pipe(res),
     );

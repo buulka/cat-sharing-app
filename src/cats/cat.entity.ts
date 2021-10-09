@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({ name: 'cats' })
 export class Cat {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   name: string;
@@ -34,7 +34,7 @@ export class Cat {
     price: number,
     isVacant: boolean,
     imgName: string,
-    id?: string,
+    id?: number,
   ) {
     this.id = id;
     this.name = name;
