@@ -17,32 +17,12 @@ export class Cat {
   @Column()
   age: number;
 
-  @Column()
+  @Column('float')
   price: number;
 
-  @Column({ default: true })
-  isVacant: boolean;
+  @Column({ default: true, nullable: true })
+  isVacant?: boolean;
 
-  @Column({ default: null })
-  imgName: string;
-
-  constructor(
-    name: string,
-    color: string,
-    breed: string,
-    age: number,
-    price: number,
-    isVacant: boolean,
-    imgName: string,
-    id?: number,
-  ) {
-    this.id = id;
-    this.name = name;
-    this.color = color;
-    this.breed = breed;
-    this.age = age;
-    this.price = price;
-    this.imgName = imgName;
-    this.isVacant = isVacant;
-  }
+  @Column({ default: null, nullable: true })
+  imgName?: string;
 }

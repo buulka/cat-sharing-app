@@ -65,7 +65,16 @@ export class CatsService {
     isVacant: boolean,
     imgName: string,
   ): Promise<void> {
-    const cat = new Cat(name, color, breed, age, price, isVacant, imgName);
+    // const cat = new Cat(name, color, breed, age, price, isVacant, imgName);
+    const cat = new Cat();
+    cat.name = name;
+    cat.color = color;
+    cat.breed = breed;
+    cat.age = age;
+    cat.price = price;
+    cat.isVacant = isVacant;
+    cat.imgName = imgName;
+
     await this.catsRepository.save(cat);
   }
 
