@@ -22,8 +22,8 @@ REST API для сервиса шеринга котиков
 * `breed` - порода котика (string)
 * `age` - возраст котика (integer)
 * `price` - стоимость аренды котика (double)
-* `isVacant` - состояние брони котика, по умолчанию true (boolean)
-* `imgName` - название фотографии котика, хранящейся в Minio,по умолчанию null (boolean)
+* `isVacant` - состояние брони котика, по умолчанию true (boolean, required=false)
+* `imgName` - название фотографии котика, хранящейся в Minio,по умолчанию null (boolean, required=false)
 
 
 #### API Endpoints
