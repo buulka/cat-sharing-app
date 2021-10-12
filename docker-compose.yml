@@ -31,8 +31,11 @@ services:
       context: .
     container_name: cat-sharing-app
     environment:
-      MINIO_HOST: 'minio'
+      MINIO_HOST: 'http://minio:9000'
       DB_HOST: 'postgres'
+      PG_USERNAME: 'postgres'
+      PG_PASSWORD: '5923014kate'
+      PG_DATABASE: 'postgres'
     ports:
       - '3000:3000'
     restart: always

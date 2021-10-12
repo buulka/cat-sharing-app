@@ -3,29 +3,25 @@ import { Response } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cat } from './cat.entity';
 import { Repository } from 'typeorm';
-import Minio from 'minio';
+import { InjectS3, S3 } from 'nestjs-s3';
 
 @Injectable()
 export class CatsService {
-  private readonly minioClient: Minio.Client;
+  // private readonly minioClient: Minio.Client;
 
   constructor(
     @InjectRepository(Cat)
     private readonly catsRepository: Repository<Cat>,
+    @InjectS3() private readonly s3: S3,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const Minio = require('minio');
-    this.minioClient = new Minio.Client({
-      endPoint:
-        process.env.MINIO_HOST == null ? '127.0.0.1' : process.env.MINIO_HOST,
-      port: 9000,
-      accessKey: 'minioadmin',
-      secretKey: 'minioadmin',
-      useSSL: false,
-    });
-    this.minioClient.bucketExists('cats').then((exists) => {
-      if (!exists) this.minioClient.makeBucket('cats', 'us-east-1');
-    });
+    async function makeBucket() {
+      await s3.headBucket({ Bucket: 'cats' }, function (err) {
+        if (err) s3.createBucket({ Bucket: 'cats' }).send();
+        else console.log('bucket exists');
+      });
+    }
+
+    makeBucket();
   }
 
   async getAll(): Promise<Cat[]> {
@@ -65,7 +61,6 @@ export class CatsService {
     isVacant: boolean,
     imgName: string,
   ): Promise<void> {
-    // const cat = new Cat(name, color, breed, age, price, isVacant, imgName);
     const cat = new Cat();
     cat.name = name;
     cat.color = color;
@@ -79,20 +74,25 @@ export class CatsService {
   }
 
   async addPhoto(id: number, buffer: Buffer): Promise<void> {
-    const metaData = {
-      'Content-Type': 'image/jpg',
-    };
-
     const imgName = id + '.jpg';
-
-    await this.minioClient.putObject('cats', imgName, buffer, metaData);
+    const params = {
+      Body: buffer,
+      Bucket: 'cats',
+      Key: imgName,
+    };
+    await this.s3.putObject(params).send();
     console.log('Image added');
     await this.catsRepository.update(id, { imgName: imgName });
   }
 
   async getPhotoById(id: number, res: Response) {
-    this.minioClient.getObject('cats', id + '.jpg', (error, result) =>
-      result.pipe(res),
-    );
+    const params = {
+      Bucket: 'cats',
+      Key: id + '.jpg',
+      // Range: 'bytes=0-9',
+    };
+
+    this.s3.getObject(params).createReadStream().pipe(res);
+    // const a = await this.s3.getObject(params).promise();
   }
 }
